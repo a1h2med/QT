@@ -39,7 +39,7 @@ user_input_eqn = ''
 user_input_min = 0
 user_input_max = 0
 errorMessage = ''
-
+var = ''
 # this function is made to check whether I've nearly reached the end of the equation or not.
 def symbol_checking(symbol, function):
     """
@@ -69,10 +69,25 @@ def Error_Handling(error_code_number):
         4: 'Expected a digit or a variable',
         5: 'Expected a variable',
         6: 'Make sure that Min/Max is a valid integer number',
-        7: 'Please recheck Max/Min values'
+        7: 'Please recheck Max/Min values',
+        8: 'Expected to end with a variable or a digit'
     }
     errorMessage = switch.get(error_code_number)
 
+# this function mainly gets all the digit, as I'm looping char by char,
+# so if there's an integer it will be parsed like: 1,0,0
+# while 100 is a number, so I've to get the whole integer.
+def getDigit(function, current_char, symbol):
+    temp = ''
+    while current_char.isdigit():
+        temp += current_char
+        if symbol < len(function) - 1:
+            symbol += 1
+        else:
+            symbol += 1
+            break
+        current_char = function[symbol]
+    return int(temp), symbol
 
 # checking syntax of the equation provided by the user.
 # here I'll check on certain things,
@@ -84,6 +99,7 @@ def Lexical_Analyzer(function):
     :return: false, whenever there's an error, else it will call parser, passing operators found,
     digits, and variables, then returns whatever it returns.
     """
+    global var
     list_of_operators = []
     list_of_digits = []
     variable = ''
@@ -93,12 +109,13 @@ def Lexical_Analyzer(function):
     # 1- loop over the string
     # 2- get current char and check on it to know what it is.
     # 3- if not found raise an error, else store it.
-    for symbol in range(len(function)):
+    symbol = 0
+    while symbol in range(len(function)):
         current_char = function[symbol]
-
         if current_char == '+' or current_char == '-' or current_char == '*' or current_char == '/' \
                 or current_char == '^':
             list_of_operators.append(current_char)
+
         elif current_char.isalpha():
             if flag == 0:
                 variable = current_char
@@ -109,11 +126,15 @@ def Lexical_Analyzer(function):
                 else:
                     Error_Handling(1)
                     return False
+
         elif current_char.isdigit():
-            list_of_digits.append(int(current_char))
+            temp, symbol = getDigit(function, current_char, symbol)
+            list_of_digits.append(int(temp))
+            continue
         else:
             Error_Handling(2)
             return False
+        symbol += 1
     if variable == '':
         Error_Handling(5)
         return False
@@ -177,7 +198,13 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
                                 output = Parser_Analyzer(function, list_of_digits, list_of_operators, variable, 1)
                                 return output
                         elif ord(current_symbol[0]) - 48 in range(0, 9):
-                            if int(current_symbol) in list_of_digits:
+                            # get the whole digit.
+                            temp, symbol = getDigit(function, current_symbol, symbol)
+                            # decrease the symbol value by 1, to get the previous char, and proceed.
+                            # in case you have (1) so entered symbol is x, out is x+2, so I need to decrease it,
+                            # I can't decrease it in the function itself as I need it somewhere else
+                            symbol -= 1
+                            if temp in list_of_digits:
                                 if symbol == len(function) - 1:
                                     return True
                                 else:
@@ -185,17 +212,19 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
                                     output = Parser_Analyzer(function, list_of_digits, list_of_operators, variable, 1)
                                     return output
                         else:
+                            # if it's not a variable or a digit raise an error
                             Error_Handling(4)
                             return False
                     else:
                         Error_Handling(4)
                         return out
                 else:
+                    # if it's not an operator raise an error, as variable should has operator after it.
                     Error_Handling(3)
                     return False
             else:
                 return True
-        # operator part
+            # operator part
         elif starting_flag != 0:
             # check on symbol.
             # check on length.
@@ -214,7 +243,9 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
                             output = Parser_Analyzer(function, list_of_digits, list_of_operators, variable, 1)
                             return output
                     elif ord(current_symbol[0]) - 48 in range(0, 9):
-                        if int(current_symbol) in list_of_digits:
+                        temp, symbol = getDigit(function, current_symbol, symbol)
+                        symbol -= 1
+                        if temp in list_of_digits:
                             if symbol == len(function) - 1:
                                 return True
                             else:
@@ -230,7 +261,9 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
                         return True
                     elif ord(current_symbol[0]) - 48 in range(0, 9):
                         if ord(current_symbol[0]) - 48 in range(0, 9):
-                            if int(current_symbol) in list_of_digits:
+                            temp, symbol = getDigit(function, current_symbol, symbol)
+                            symbol -= 1
+                            if temp in list_of_digits:
                                 function = function[symbol + 1:]
                                 return True
                     else:
@@ -239,9 +272,11 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
             else:
                 return True
 
-        # digit part, same as variable part
+            # digit part, same as variable part
         elif ord(current_symbol[0]) - 48 in range(0, 9):
-            if int(current_symbol) in list_of_digits:
+            temp, symbol = getDigit(function, current_symbol, symbol)
+            symbol -= 1
+            if temp in list_of_digits:
                 out = symbol_checking(symbol, function)
                 symbol += 1
                 if out:
@@ -259,7 +294,9 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
                                     output = Parser_Analyzer(function, list_of_digits, list_of_operators, variable, 1)
                                     return output
                             elif ord(current_symbol[0]) - 48 in range(0, 9):
-                                if int(current_symbol) in list_of_digits:
+                                temp, symbol = getDigit(function, current_symbol, symbol)
+                                symbol -= 1
+                                if temp in list_of_digits:
                                     if symbol == len(function) - 1:
                                         return True
                                     else:
@@ -282,6 +319,7 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
         else:
             Error_Handling(4)
             return False
+
     if len(function) == 0:
         return True
 
@@ -296,11 +334,13 @@ def MinMaxChecking(input_string):
     """
         1- it will loop on provided string.
         2- checks on the ASCII code of each char of it
-        3- raise an error if there were any, else return int of string 
+        3- raise an error if there were any, else check if it's a (-) sign or not else return int of string 
     """
     flag = 1
     for i in range(len(input_string)):
         if ord(input_string[i]) - 48 in range(0, 9):
+            continue
+        elif (i == 0) and (input_string[i] == '-'):
             continue
         else:
             flag = 0
@@ -430,10 +470,12 @@ class Window(QDialog):
         global user_input_eqn
         global user_input_min
         global user_input_max
+        global var
         self.figure.clear()
 
         # before plotting, replace every ^ with **, to server the correct function.
-        user_input_eqn.replace("^", "**")
+        user_input_eqn = user_input_eqn.replace("^", "**")
+#        eqn.replace("xx", "x")
         x = np.array(range(user_input_min, user_input_max))
         y = eval(user_input_eqn)
         ax = self.figure.add_subplot(111)
