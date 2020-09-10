@@ -20,7 +20,9 @@
         1- it can draw equations which has only one variable.
         2- as this application is still under development, so it supports only (+, -, *, ^, /), for now.
         3- it can't handle (,{,[, which will be considered during future thoughts.
+        
 
+    Author => Ahmed Ashraf
 """
 # call required libraries
 import numpy as np
