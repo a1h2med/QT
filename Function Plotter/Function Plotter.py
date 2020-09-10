@@ -20,9 +20,7 @@
         1- it can draw equations which has only one variable.
         2- as this application is still under development, so it supports only (+, -, *, ^, /), for now.
         3- it can't handle (,{,[, which will be considered during future thoughts.
-        
 
-    Author => Ahmed Ashraf
 """
 # call required libraries
 import numpy as np
@@ -140,12 +138,12 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
         3- [variable]+
     """
     for symbol in range(len(function)):
-        
+
         # get the current char, and check on it, whether it's a variable or integer, if nothing raise an error.
         # it's clearly that it's the same steps, but I've made to steps before performing recursion (explained down)
-        # as I've seen that it was the best thing to separate the equation into three parts, if I have an equation 
+        # as I've seen that it was the best thing to separate the equation into three parts, if I have an equation
         # like: x+2+3+4, then it was easier to cut it like x+2, then pass whatever comes again to the function
-        # which should be an operator followed by an equation or a digit, like in the above example, which 
+        # which should be an operator followed by an equation or a digit, like in the above example, which
         # in my case will be: +3, +4.
         current_symbol = function[symbol]
         if current_symbol == variable:
@@ -155,7 +153,7 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
             symbol += 1
             # if symbol is not at its end, then proceed
             if out:
-                # get the current char, and check whether it's in the list of operators 
+                # get the current char, and check whether it's in the list of operators
                 # provided by the lexical analyzer or not, if not check on the digits list
                 # if not raise an error.
                 current_symbol = function[symbol]
@@ -164,16 +162,16 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
                     symbol += 1
                     if out:
                         # get the current char, check whether it's a variable or digit or raise an error.
-                        # check on the length, if it's the last, return true, 
-                        # else call the parser again, passing to it the new function, 
-                        # list of digits, operators, variable, and flag which indicates whether it's the 
+                        # check on the length, if it's the last, return true,
+                        # else call the parser again, passing to it the new function,
+                        # list of digits, operators, variable, and flag which indicates whether it's the
                         # first call or not, as it's not so I need it to get into the (operator part).
                         current_symbol = function[symbol]
                         if current_symbol == variable:
                             if symbol == len(function) - 1:
                                 return True
                             else:
-                                
+
                                 # pass unchecked part of the equation.
                                 function = function[symbol + 1:]
                                 output = Parser_Analyzer(function, list_of_digits, list_of_operators, variable, 1)
@@ -196,9 +194,7 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
                     Error_Handling(3)
                     return False
             else:
-                # ToDo support one variable input.
-                Error_Handling(3)
-                return out
+                return True
         # operator part
         elif starting_flag != 0:
             # check on symbol.
@@ -242,7 +238,7 @@ def Parser_Analyzer(function, list_of_digits, list_of_operators, variable, start
                         return out
             else:
                 return True
-        
+
         # digit part, same as variable part
         elif ord(current_symbol[0]) - 48 in range(0, 9):
             if int(current_symbol) in list_of_digits:
@@ -401,8 +397,9 @@ class FunctionPlotter(QDialog):
             self.hide()
         else:
             global errorMessage
-            if user_input_max <= user_input_min:
-                Error_Handling(7)
+            if (user_input_min != '') and (user_input_max != ''):
+                if user_input_max <= user_input_min:
+                    Error_Handling(7)
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Error")
