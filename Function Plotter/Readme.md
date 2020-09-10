@@ -43,8 +43,9 @@ error
     2- displays error messages if any.  
     3- takes min, max range for the function.  
     4- checks on the input range.  
-    5- plot entered equation using matplotlib, which is embedded in PySide2 GUI.  
-    6- simple design.  
+    5- supports negative range.  
+    6- plot entered equation using matplotlib, which is embedded in PySide2 GUI.  
+    7- simple design.  
 
 ## Limitations:
     1- it can draw equations which has only one variable.  
