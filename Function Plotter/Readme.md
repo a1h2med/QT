@@ -1,12 +1,12 @@
 # Function Plotter
-This project intends to plot any function user enters.
-this project is separated into multiple parts, the first two parts behaves as a compiler,
-it  1- checks the syntax provided by the user, saves it,
-    2- checks the grammar provided.
-third part is GUI which consists of:
+This project intends to plot any function user enters.  
+this project is separated into multiple parts, the first two parts behaves as a compiler,  
+it  1- checks the syntax provided by the user, saves it,  
+    2- checks the grammar provided.  
+third part is GUI which consists of:  
     1- labels           2- text editor           3- button
-    4- plot
-fourth and final part is the part where it calculates the function and plot it.
+    4- plot  
+fourth and final part is the part where it calculates the function and plot it.  
 
 ## Table Of Contents
 * [Application](#system-layout).  
